@@ -6,10 +6,24 @@ import {
 import { SocketService } from './socket.service';
 import { CreateSocketDto } from './dto/create-socket.dto';
 import { UpdateSocketDto } from './dto/update-socket.dto';
+import { Logger } from '@nestjs/common';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
 export class SocketGateway {
   constructor(private readonly socketService: SocketService) {}
+
+  @SubscribeMessage('TestMessage')
+  socketTest(@MessageBody() data: any) {
+    Logger.log(data); //{ test: 'test data' } - message comming from front
+    return {
+      event: 'socketTest',
+      data,
+    };
+  }
 
   @SubscribeMessage('createSocket')
   create(@MessageBody() createSocketDto: CreateSocketDto) {
